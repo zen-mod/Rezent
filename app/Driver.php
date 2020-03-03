@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Notifications\BuildNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -29,6 +30,6 @@ abstract class Driver
     public function send(): bool
     {
         // ToDo: Create new Notification
-        return true;
+        return (new BuildNotification())->
     }
 }

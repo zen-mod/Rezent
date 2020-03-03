@@ -7,7 +7,7 @@ use App\Driver;
 class ActionsDriver extends Driver
 {
     protected const VALIDATION_RULES = [
-        'title' => 'required|string',
+        'id' => 'required|integer',
     ];
 
     public function create(array $validated): self
