@@ -77,7 +77,7 @@ class ActionsDriver extends Driver
                 return Colors::FAILED();
 
             default:
-                return Colors::BROKEN();
+                return Colors::CANCELED();
         }
     }
 
