@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Driver;
 use App\Drivers\ActionsDriver;
 use App\Drivers\PipelinesDriver;
 use App\Drivers\TravisDriver;
-use Exception;
+use App\Exceptions\DriverNotFound;
+use App\Notifications\BuildNotification;
 use Illuminate\Http\Request;
 
 class DriverController extends Controller
@@ -33,14 +33,15 @@ class DriverController extends Controller
     {
         $this->ensureValidDriver($driverName);
 
-        $driver = $this->driver($driverName);
+        $driverClassPath = $this->driver($driverName);
 
-        $validated = $driver->validate($request);
+        $validated = $driverClassPath::validate($request);
+        $driver = new $driverClassPath($validated);
 
-        $driver = $driver->create($validated);
+        $driver->notify(new BuildNotification());
 
         return response()->json([
-            'successful' => $driver->send(),
+            'successful' => true,
         ]);
     }
 
@@ -48,7 +49,7 @@ class DriverController extends Controller
      * Ensures a valid, supported driver is used.
      *
      * @param string $name
-     * @throws Illuminate\Http\Exceptions\HttpResponseException
+     * @throws App\Exceptions\DriverNotFound
      */
     protected function ensureValidDriver(string $name)
     {
@@ -63,24 +64,31 @@ class DriverController extends Controller
                 break;
 
             default:
-                abort(400, 'Unknown build driver.');
+                throw new DriverNotFound();
         }
     }
 
-    protected function driver(string $name): Driver
+    /**
+     * Returns a class name path to the driver to use.
+     *
+     * @param string $name Driver name.
+     * @return string Class name path.
+     * @throws App\Exceptions\DriverNotFound Unknown driver found.
+     */
+    protected function driver(string $name): string
     {
         switch ($name) {
             case 'pipelines':
-                return new PipelinesDriver();
+                return PipelinesDriver::class;
 
             case 'travis':
-                return new TravisDriver();
+                return TravisDriver::class;
 
             case 'actions':
-                return new ActionsDriver();
+                return ActionsDriver::class;
 
             default:
-                throw new Exception('Unknown driver to create.');
+                throw new DriverNotFound();
         }
     }
 }

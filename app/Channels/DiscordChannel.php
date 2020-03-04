@@ -3,6 +3,7 @@
 namespace App\Channels;
 
 use App\Notifications\BuildNotification;
+use Illuminate\Support\Facades\Http;
 
 class DiscordChannel
 {
@@ -15,9 +16,22 @@ class DiscordChannel
      */
     public function send($notifiable, BuildNotification $notification)
     {
-        $message = $notification->toArray($notifiable);
+        $message = $notification->toDiscord($notifiable);
 
-        // Send notification to the $notifiable instance...
+        $response = Http::post(
+            $this->generateUri(),
+            $message
+        );
 
+        // If failed to post, throw exception.
+        $response->throw();
+    }
+
+    protected function generateUri(): string
+    {
+        $id = config('services.discord.id');
+        $token = config('services.discord.token');
+
+        return 'https://discordapp.com/api/webhooks/' . $id . '/' . $token;
     }
 }

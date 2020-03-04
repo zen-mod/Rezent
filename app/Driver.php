@@ -2,21 +2,22 @@
 
 namespace App;
 
-use App\Notifications\BuildNotification;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 abstract class Driver
 {
-    protected const VALIDATION_RULES = self::VALIDATION_RULES;
+    use Notifiable;
 
-    abstract public function create(array $validated);
+    protected const VALIDATION_RULES = self::VALIDATION_RULES;
+    public $embed = [];
 
     abstract public function wasSuccessful(): bool;
     abstract public function wasAlreadySent(): bool;
 
-    public function validate(Request $request)
+    public static function validate(Request $request)
     {
         $validator = Validator::make($request->all(), static::VALIDATION_RULES);
 
@@ -25,11 +26,5 @@ abstract class Driver
         }
 
         return $validator->validated();
-    }
-
-    public function send(): bool
-    {
-        // ToDo: Create new Notification
-        return (new BuildNotification())->
     }
 }
