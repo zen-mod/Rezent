@@ -4,7 +4,7 @@ namespace App\Drivers;
 
 use App\Driver;
 
-class PipelinesDriver extends Driver
+class PipelinesDriver //extends Driver
 {
     //
 }

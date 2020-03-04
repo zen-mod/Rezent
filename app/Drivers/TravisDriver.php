@@ -4,7 +4,7 @@ namespace App\Drivers;
 
 use App\Driver;
 
-class TravisDriver extends Driver
+class TravisDriver //extends Driver
 {
     //
 }
