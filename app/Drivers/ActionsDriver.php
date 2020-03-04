@@ -4,13 +4,13 @@ namespace App\Drivers;
 
 use App\Colors;
 use App\Driver;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class ActionsDriver extends Driver
 {
-    public $embed;
+    protected $validated;
+    protected $payload;
 
     protected const VALIDATION_RULES = [
         'organisation' => 'required|string',
@@ -20,51 +20,56 @@ class ActionsDriver extends Driver
 
     public function __construct(array $validated)
     {
-        $this->embed = $this->create($validated);
+        $this->validated = $validated;
+        $this->payload = $this->getGitHubPayload();
+
+        $this->commitHash = $this->payload->head_sha;
+        $this->branch = $this->payload->head_branch;
+
+        $this->embed = $this->create();
     }
 
-    protected function create(array $validated): array
+    protected function create(): array
     {
-        $payload = $this->getGitHubPayload($validated);
-        $commit = $this->getBuildCommitDetails($payload);
+        $commit = $this->getBuildCommitDetails($this->payload);
 
         return [
             'author' => [
                 'icon_url' => $commit->author->avatar_url,
-                'name' => $payload->head_commit->author->name,
+                'name' => $this->payload->head_commit->author->name,
                 'url' => $commit->author->html_url,
             ],
-            'color' => $this->getBuildColor($payload),
-            'description' => $this->getBuildDescription($payload, $commit),
-            'timestamp' => Carbon::now(),
-            'title' => $this->getBuildTitle($payload),
-            'url' => $payload->html_url,
+            'color' => $this->getBuildColor(),
+            'description' => $this->getBuildDescription($commit),
+            'timestamp' => $this->payload->updated_at,
+            'title' => $this->getBuildTitle(),
+            'url' => $this->payload->html_url,
         ];
     }
 
-    protected function getGitHubUri(array $validated): string
+    protected function getGitHubUri(): string
     {
         return 'https://api.github.com/repos/'
-            . $validated['organisation'] . '/'
-            . $validated['repository'] . '/'
+            . $this->validated['organisation'] . '/'
+            . $this->validated['repository'] . '/'
             . 'actions/workflows/'
-            . $validated['workflow_id'] . '/'
+            . $this->validated['workflow_id'] . '/'
             . 'runs?per_page=1';
     }
 
-    protected function getGitHubPayload(array $validated): object
+    protected function getGitHubPayload(): object
     {
         $response = Http::get(
-            $this->getGitHubUri($validated)
+            $this->getGitHubUri()
         )->throw();
 
         return json_decode($response->body())
             ->workflow_runs[0];
     }
 
-    protected function getBuildColor(object $payload): Colors
+    protected function getBuildColor(): Colors
     {
-        switch ($payload->conclusion) {
+        switch ($this->payload->conclusion) {
             case 'success':
                 return Colors::PASSED();
 
@@ -72,47 +77,37 @@ class ActionsDriver extends Driver
                 return Colors::FAILED();
 
             default:
-                Colors::CANCELED();
+                Colors::BROKEN();
         }
     }
 
-    protected function getBuildDescription(object $payload, object $commit): string
+    protected function getBuildDescription(object $commit): string
     {
-        $gitHash = substr($payload->head_sha, 0, 7);
+        $gitHash = substr($this->payload->head_sha, 0, 7);
         $commitUrl = $commit->html_url;
-        $commitName = $payload->head_commit->message;
+        $commitName = $this->payload->head_commit->message;
 
         return "[{$gitHash}]({$commitUrl}) {$commitName}";
     }
 
-    protected function getBuildTitle(object $payload): string
+    protected function getBuildTitle(): string
     {
-        $repoInfo = "[{$payload->repository->full_name}]:{$payload->head_branch}";
-        $number = $payload->run_number;
-        $status = Str::ucfirst($payload->conclusion);
+        $repoInfo = "[{$this->payload->repository->full_name}]:{$this->payload->head_branch}";
+        $number = $this->payload->run_number;
+        $status = Str::ucfirst($this->payload->conclusion);
 
         return "{$repoInfo} Build #{$number} {$status}";
     }
 
-    protected function getBuildCommitDetails(object $payload): object
+    protected function getBuildCommitDetails(): object
     {
         $response = Http::get(
             'https://api.github.com/repos/'
-                . $payload->repository->full_name
+                . $this->payload->repository->full_name
                 . '/commits/'
-                . $payload->head_sha
+                . $this->payload->head_sha
         )->throw();
 
         return json_decode($response->body());
-    }
-
-    public function wasSuccessful(): bool
-    {
-        return $this->embed->color == Colors::PASSED();
-    }
-
-    public function wasAlreadySent(): bool
-    {
-        return false;
     }
 }

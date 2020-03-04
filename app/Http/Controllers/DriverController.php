@@ -36,12 +36,23 @@ class DriverController extends Controller
         $driverClassPath = $this->driver($driverName);
 
         $validated = $driverClassPath::validate($request);
+
+        /**
+         * @var \App\Driver\Driver $driver
+         */
         $driver = new $driverClassPath($validated);
 
-        $driver->notify(new BuildNotification());
+        $ignored = true;
+
+        if (!$driver->wasAlreadySent()) {
+            $driver->notify(new BuildNotification());
+
+            $ignored = false;
+        }
 
         return response()->json([
             'successful' => true,
+            'ignored' => $ignored,
         ]);
     }
 
