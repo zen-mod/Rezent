@@ -18,13 +18,10 @@ class DiscordChannel
     {
         $message = $notification->toDiscord($notifiable);
 
-        $response = Http::post(
+        Http::post(
             $this->generateUri(),
             $message
-        );
-
-        // If failed to post, throw exception.
-        $response->throw();
+        )->throw();
     }
 
     protected function generateUri(): string
