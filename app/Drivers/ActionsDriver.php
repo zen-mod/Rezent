@@ -2,10 +2,11 @@
 
 namespace App\Drivers;
 
+use App\Colors;
 use App\Driver;
 use Carbon\Carbon;
-use App\Colors;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class ActionsDriver extends Driver
 {
@@ -25,26 +26,16 @@ class ActionsDriver extends Driver
     protected function create(array $validated): array
     {
         $payload = $this->getGitHubPayload($validated);
+        $commit = $this->getBuildCommitDetails($payload);
 
-        /**
-         * Author:
-         *  - icon_url
-         *  - name
-         *  - url
-         * Color
-         * Description: [{gitHash}]({commitUrl}) {commitName}
-         * Timestamp
-         * Title: {repo} Build #{number} {status}
-         * Url
-         */
         return [
             'author' => [
-                'icon_url' => '',
+                'icon_url' => $commit->author->avatar_url,
                 'name' => $payload->head_commit->author->name,
-                'url' => '',
+                'url' => $commit->author->html_url,
             ],
             'color' => $this->getBuildColor($payload),
-            'description' => $this->getBuildDescription($payload),
+            'description' => $this->getBuildDescription($payload, $commit),
             'timestamp' => Carbon::now(),
             'title' => $this->getBuildTitle($payload),
             'url' => $payload->html_url,
@@ -65,7 +56,7 @@ class ActionsDriver extends Driver
     {
         $response = Http::get(
             $this->getGitHubUri($validated)
-        );
+        )->throw();
 
         return json_decode($response->body())
             ->workflow_runs[0];
@@ -85,10 +76,10 @@ class ActionsDriver extends Driver
         }
     }
 
-    protected function getBuildDescription(object $payload): string
+    protected function getBuildDescription(object $payload, object $commit): string
     {
         $gitHash = substr($payload->head_sha, 0, 7);
-        $commitUrl = $payload->html_url;
+        $commitUrl = $commit->html_url;
         $commitName = $payload->head_commit->message;
 
         return "[{$gitHash}]({$commitUrl}) {$commitName}";
@@ -98,9 +89,21 @@ class ActionsDriver extends Driver
     {
         $repoInfo = "[{$payload->repository->full_name}]:{$payload->head_branch}";
         $number = $payload->run_number;
-        $status = $payload->conclusion;
+        $status = Str::ucfirst($payload->conclusion);
 
         return "{$repoInfo} Build #{$number} {$status}";
+    }
+
+    protected function getBuildCommitDetails(object $payload): object
+    {
+        $response = Http::get(
+            'https://api.github.com/repos/'
+                . $payload->repository->full_name
+                . '/commits/'
+                . $payload->head_sha
+        )->throw();
+
+        return json_decode($response->body());
     }
 
     public function wasSuccessful(): bool
