@@ -1,7 +1,7 @@
-# Principle of Mechilles
+# Principle of Rezent
 
 ```yaml
-POST https://mechilles.garkaklis.com/api/driver/{pipelines|travis|actions}
+POST https://rezent.garkaklis.com/api/driver/{pipelines|travis|actions}
 ```
 
 ## App/Http/DriverController
