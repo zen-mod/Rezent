@@ -34,7 +34,7 @@ class ActionsDriver extends Driver
     {
         $commit = $this->getBuildCommitDetails($this->payload);
 
-        Log::channel('slack')->critical($this->payload->conclusion);
+        Log::channel('sentry')->debug(json_encode($this->payload));
 
         return [
             'author' => [
