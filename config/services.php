@@ -35,4 +35,8 @@ return [
         'token' => env('DISCORD_WEBHOOK_TOKEN'),
     ],
 
+    'slack' => [
+        'hook' => env('SLACK_HOOK', ''),
+    ],
+
 ];

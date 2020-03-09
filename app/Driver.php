@@ -67,4 +67,9 @@ abstract class Driver
             'successful' => $this->wasSuccessful(),
         ]);
     }
+
+    public function routeNotificationForSlack($notification)
+    {
+        return config('services.slack.hook', '');
+    }
 }
