@@ -78,8 +78,7 @@ class ActionsDriver extends Driver
                 return Colors::FAILED();
 
             default:
-                // Sometimes the API isn't fast enough to catch up, so defer to being PASSED.
-                return Colors::PASSED();
+                return Colors::CANCELED();
         }
     }
 
