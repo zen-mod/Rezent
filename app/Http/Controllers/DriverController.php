@@ -6,7 +6,7 @@ use App\Drivers\ActionsDriver;
 use App\Drivers\PipelinesDriver;
 use App\Drivers\TravisDriver;
 use App\Exceptions\DriverNotFound;
-use App\Notifications\BuildNotification;
+use App\Jobs\SendBuildNotification;
 use Illuminate\Http\Request;
 
 class DriverController extends Controller
@@ -37,22 +37,10 @@ class DriverController extends Controller
 
         $validated = $driverClassPath::validate($request);
 
-        /**
-         * @var \App\Driver\Driver $driver
-         */
-        $driver = new $driverClassPath($validated);
-
-        $ignored = true;
-
-        if (!$driver->wasAlreadySent()) {
-            $driver->notify(new BuildNotification());
-
-            $ignored = false;
-        }
+        SendBuildNotification::dispatch($driverClassPath, $validated);
 
         return response()->json([
-            'successful' => true,
-            'ignored' => $ignored,
+            'queued' => true,
         ]);
     }
 
