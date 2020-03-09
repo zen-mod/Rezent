@@ -6,6 +6,7 @@ use App\Colors;
 use App\Driver;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Log;
 
 class ActionsDriver extends Driver
 {
@@ -32,6 +33,8 @@ class ActionsDriver extends Driver
     protected function create(): array
     {
         $commit = $this->getBuildCommitDetails($this->payload);
+
+        Log::channel('slack')->critical($this->payload->conclusion);
 
         return [
             'author' => [
