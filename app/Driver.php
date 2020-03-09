@@ -47,7 +47,7 @@ abstract class Driver
         /**
          * @var null|\App\Build $build
          */
-        $build = Build::where('branch', $this->branch)->first();
+        $build = Build::where('branch', $this->branch)->latest()->first();
 
         // If the last build was successful and the new build was sucessful too, then ignore.
         if ($build && $build->successful && $this->wasSuccessful()) {
