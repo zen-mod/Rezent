@@ -6,7 +6,6 @@ use App\Colors;
 use App\Driver;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use Log;
 
 class ActionsDriver extends Driver
 {
