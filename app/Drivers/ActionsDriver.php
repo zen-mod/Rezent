@@ -34,8 +34,6 @@ class ActionsDriver extends Driver
     {
         $commit = $this->getBuildCommitDetails($this->payload);
 
-        Log::channel('sentry')->debug(json_encode($this->payload));
-
         return [
             'author' => [
                 'icon_url' => $commit->author->avatar_url,
