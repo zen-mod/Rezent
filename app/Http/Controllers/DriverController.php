@@ -31,9 +31,7 @@ class DriverController extends Controller
      */
     public function __invoke(Request $request, string $driverName)
     {
-        $this->ensureValidDriver($driverName);
-
-        $driverClassPath = $this->driver($driverName);
+        $driverClassPath = $this->getValidDriver($driverName);
 
         $validated = $driverClassPath::validate($request);
 
@@ -45,36 +43,13 @@ class DriverController extends Controller
     }
 
     /**
-     * Ensures a valid, supported driver is used.
+     * Ensures a valid, supported driver is used and returns the driver class name path.
      *
      * @param string $name
+     * @return string
      * @throws App\Exceptions\DriverNotFound
      */
-    protected function ensureValidDriver(string $name)
-    {
-        switch ($name) {
-            case 'pipelines':
-                break;
-
-            case 'travis':
-                break;
-
-            case 'actions':
-                break;
-
-            default:
-                throw new DriverNotFound();
-        }
-    }
-
-    /**
-     * Returns a class name path to the driver to use.
-     *
-     * @param string $name Driver name.
-     * @return string Class name path.
-     * @throws App\Exceptions\DriverNotFound Unknown driver found.
-     */
-    protected function driver(string $name): string
+    protected function getValidDriver(string $name): string
     {
         switch ($name) {
             case 'pipelines':
