@@ -78,6 +78,21 @@ abstract class Driver
         return config('services.slack.hook', '');
     }
 
+    public function getBuildDescription($sha, $commitUrl, $commitName): string
+    {
+        $gitHash = substr($sha, 0, 7);
+
+        return "[{$gitHash}]({$commitUrl}) {$commitName}";
+    }
+
+    public function getBuildTitle($orgAndRepo, $branch, $number, $conclusion): string
+    {
+        $repoInfo = "[{$orgAndRepo}]:{$branch}";
+        $status = ucfirst($conclusion);
+
+        return "{$repoInfo} Build #{$number} {$status}";
+    }
+
     public function getBuildColor(string $status): Colors
     {
         $canceled = explode('|', $this::STATUSES_CANCELED);
