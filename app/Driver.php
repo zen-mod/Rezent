@@ -15,6 +15,11 @@ abstract class Driver
 
     protected const VALIDATION_RULES = self::VALIDATION_RULES;
 
+    protected const STATUSES_CANCELED = self::STATUSES_CANCELED;
+    protected const STATUSES_FAILED = self::STATUSES_FAILED;
+    protected const STATUSES_PASSED = self::STATUSES_PASSED;
+    protected const STATUSES_PENDING = self::STATUSES_PENDING;
+
     public $embed = [];
     public $commitHash = '';
     public $branch = '';
@@ -71,5 +76,31 @@ abstract class Driver
     public function routeNotificationForSlack($notification)
     {
         return config('services.slack.hook', '');
+    }
+
+    public function getBuildColor(string $status): Colors
+    {
+        $canceled = explode('|', $this::STATUSES_CANCELED);
+        $failed = explode('|', $this::STATUSES_FAILED);
+        $passed = explode('|', $this::STATUSES_PASSED);
+        $pending = explode('|', $this::STATUSES_PENDING);
+
+        if (in_array($status, $canceled)) {
+            return Colors::CANCELED();
+        }
+
+        if (in_array($status, $failed)) {
+            return Colors::FAILED();
+        }
+
+        if (in_array($status, $passed)) {
+            return Colors::PASSED();
+        }
+
+        if (in_array($status, $pending)) {
+            return Colors::PENDING();
+        }
+
+        return Colors::CANCELED();
     }
 }
