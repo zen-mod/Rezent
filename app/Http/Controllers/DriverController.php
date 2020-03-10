@@ -6,7 +6,7 @@ use App\Drivers\ActionsDriver;
 use App\Drivers\PipelinesDriver;
 use App\Drivers\TravisDriver;
 use App\Exceptions\DriverNotFound;
-use App\Jobs\SendBuildNotification;
+use App\Jobs\ProcessBuildRequest;
 use Illuminate\Http\Request;
 
 class DriverController extends Controller
@@ -35,7 +35,7 @@ class DriverController extends Controller
 
         $validated = $driverClassPath::validate($request);
 
-        SendBuildNotification::dispatch($driverClassPath, $validated);
+        ProcessBuildRequest::dispatch($driverClassPath, $validated);
 
         return response()->json([
             'queued' => true,
