@@ -4,12 +4,13 @@ namespace App\Drivers;
 
 use App\Driver;
 use App\Support\GitHub;
-use Illuminate\Support\Facades\Http;
 
 class ActionsDriver extends Driver
 {
     protected $validated;
     protected $payload;
+
+    protected $gitHub;
 
     protected const VALIDATION_RULES = [
         'organisation' => 'required|string',
@@ -25,7 +26,13 @@ class ActionsDriver extends Driver
     public function __construct(array $validated)
     {
         $this->validated = $validated;
-        $this->payload = $this->getGitHubPayload();
+
+        $this->gitHub = new GitHub;
+        $this->payload = $this->gitHub->getLatestActionWorkflowRun(
+            $validated['organisation'],
+            $validated['repository'],
+            $validated['workflow_id']
+        );
 
         $this->commitHash = $this->payload->head_sha;
         $this->branch = $this->payload->head_branch;
@@ -35,7 +42,7 @@ class ActionsDriver extends Driver
 
     protected function create(): array
     {
-        $commit = (new GitHub)->getCommitDetails(
+        $commit = $this->gitHub->getCommitDetails(
             $this->payload->repository->full_name,
             $this->payload->head_sha
         );
@@ -61,25 +68,5 @@ class ActionsDriver extends Driver
             ),
             'url' => $this->payload->html_url,
         ];
-    }
-
-    protected function getGitHubUri(): string
-    {
-        return 'https://api.github.com/repos/'
-            . $this->validated['organisation'] . '/'
-            . $this->validated['repository'] . '/'
-            . 'actions/workflows/'
-            . $this->validated['workflow_id'] . '/'
-            . 'runs?per_page=1';
-    }
-
-    protected function getGitHubPayload(): object
-    {
-        $response = Http::get(
-            $this->getGitHubUri()
-        )->throw();
-
-        return json_decode($response->body())
-            ->workflow_runs[0];
     }
 }
