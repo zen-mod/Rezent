@@ -3,7 +3,7 @@
 namespace App\Drivers;
 
 use App\Driver;
-use GitHub;
+use App\Support\GitHub;
 
 class TravisDriver extends Driver
 {

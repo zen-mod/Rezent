@@ -3,7 +3,7 @@
 namespace App\Drivers;
 
 use App\Driver;
-use GitHub;
+use App\Support\GitHub;
 use Illuminate\Support\Facades\Http;
 
 class ActionsDriver extends Driver
@@ -57,7 +57,7 @@ class ActionsDriver extends Driver
                 $this->payload->repository->full_name,
                 $this->payload->head_branch,
                 $this->payload->run_number,
-                $this->payload->conclusion,
+                $this->payload->conclusion
             ),
             'url' => $this->payload->html_url,
         ];
