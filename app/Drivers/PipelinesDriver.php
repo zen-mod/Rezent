@@ -3,12 +3,16 @@
 namespace App\Drivers;
 
 use App\Driver;
-use GitHub;
+use App\Support\GitHub;
+use App\Support\Pipelines;
 
 class PipelinesDriver extends Driver
 {
     protected $validated;
+    protected $repositoryFullName;
+
     protected $commit;
+    protected $details;
 
     protected const VALIDATION_RULES = [
         'resource.finishTime' => 'required|date',
@@ -17,20 +21,50 @@ class PipelinesDriver extends Driver
         'resource.url' => 'required|url'
     ];
 
-    protected const STATUSES_CANCELED = 'cancelled';
-    protected const STATUSES_FAILED = 'broken|failed|stillFailing';
-    protected const STATUSES_PASSED = 'fixed|passed|succeeded';
-    protected const STATUSES_PENDING = 'pending';
+    protected const STATUSES_CANCELED = 'stopped';
+    protected const STATUSES_FAILED = 'failed|partiallySucceeded';
+    protected const STATUSES_PASSED = 'succeeded';
+    protected const STATUSES_PENDING = '';
 
     public function __construct(array $validated)
     {
         $this->validated = $validated;
 
-        $orgAndRepo = '';
+        $this->details = (new Pipelines)->getResourceDetails($validated['resource']['url']);
 
-        $this->commitHash = '';
-        $this->branch = '';
+        $explodedId = explode('/', $this->details->repository->id);
+        $this->repositoryFullName = $explodedId[0] . '/' . $explodedId[1];
 
-        $this->commit = (new GitHub)->getCommitDetails($orgAndRepo, $this->commitHash);
+        $this->commitHash = $this->details->sourceVersion;
+        $this->branch = explode('/', $this->details->sourceBranch)[2];
+
+        $this->commit = (new GitHub)->getCommitDetails($this->repositoryFullName, $this->commitHash);
+
+        $this->embed = $this->create();
+    }
+
+    protected function create(): array
+    {
+        return [
+            'author' => [
+                'icon_url' => $this->commit->author->avatar_url,
+                'name' => $this->commit->author->name,
+                'url' => $this->commit->author->html_url,
+            ],
+            'color' => $this->getBuildColor($this->validated['resource']['status']),
+            'description' => $this->getBuildDescription(
+                $this->commit->sha,
+                $this->commit->html_url,
+                $this->commit->commit->message
+            ),
+            'timestamp' => $this->validated['resource']['finishTime'],
+            'title' => $this->getBuildTitle(
+                $this->repositoryFullName,
+                $this->branch,
+                $this->validated['resource']['id'],
+                $this->validated['resource']['status']
+            ),
+            'url' => $this->details->_links->web->href,
+        ];
     }
 }
