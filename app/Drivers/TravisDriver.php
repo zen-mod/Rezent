@@ -25,7 +25,7 @@ class TravisDriver extends Driver
         'repository.owner_name' => 'required|string',
     ];
 
-    protected const STATUSES_CANCELED = 'canceled';
+    protected const STATUSES_CANCELED = 'cancelled';
     protected const STATUSES_FAILED = 'broken|failed|stillFailing';
     protected const STATUSES_PASSED = 'fixed|passed';
     protected const STATUSES_PENDING = 'pending';

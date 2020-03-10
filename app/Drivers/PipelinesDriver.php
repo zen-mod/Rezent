@@ -17,7 +17,7 @@ class PipelinesDriver extends Driver
         'resource.url' => 'required|url'
     ];
 
-    protected const STATUSES_CANCELED = 'canceled';
+    protected const STATUSES_CANCELED = 'cancelled';
     protected const STATUSES_FAILED = 'broken|failed|stillFailing';
     protected const STATUSES_PASSED = 'fixed|passed|succeeded';
     protected const STATUSES_PENDING = 'pending';
