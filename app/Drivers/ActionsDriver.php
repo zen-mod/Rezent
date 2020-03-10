@@ -18,7 +18,7 @@ class ActionsDriver extends Driver
         'workflow_id' => 'required|integer',
     ];
 
-    protected const STATUSES_CANCELED = '';
+    protected const STATUSES_CANCELED = 'cancelled';
     protected const STATUSES_FAILED = 'failure';
     protected const STATUSES_PASSED = 'success';
     protected const STATUSES_PENDING = '';
