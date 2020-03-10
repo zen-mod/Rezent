@@ -1,5 +1,9 @@
 <?php
 
+namespace App\Support;
+
+use Illuminate\Support\Facades\Http;
+
 class GitHub
 {
     public function getCommitDetails(string $orgAndRepo, string $sha): object
