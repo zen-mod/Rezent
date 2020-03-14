@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\TokenController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,3 +22,5 @@ Route::namespace('App\Http\Controllers')->group(function () {
 
 Route::get('/', IndexController::class);
 Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+Route::resource('/token', TokenController::class)->only(['create', 'store', 'destroy']);
