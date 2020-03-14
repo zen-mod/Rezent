@@ -35,7 +35,7 @@ class ProcessBuildRequest implements ShouldQueue
     public function handle()
     {
         /**
-         * @var \App\Driver\Driver $driver
+         * @var \App\Driver $driver
          */
         $driver = new $this->driver($this->validated);
 
