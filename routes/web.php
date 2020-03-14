@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::namespace('App\Http\Controllers')->group(function () {
-    Auth::routes();
+    Auth::routes(['register' => false]);
 });
 
 Route::get('/', IndexController::class);
