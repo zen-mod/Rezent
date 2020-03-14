@@ -6,3 +6,17 @@
 
 // Bootstrap
 @import '~bootstrap/scss/bootstrap';
+
+.link {
+    background: none !important;
+    border: none;
+    padding: 0 !important;
+
+    &:hover {
+        text-decoration: underline;
+
+        &.text-danger {
+            color: darken($danger, 15%) !important;
+        }
+    }
+}
