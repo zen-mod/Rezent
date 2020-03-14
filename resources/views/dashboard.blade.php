@@ -46,6 +46,7 @@
                     {{-- List projects --}}
                     <h5>All projects</h5>
 
+                    @if($tokens)
                     <table class="table">
                         <thead>
                             <th>Name</th>
@@ -68,6 +69,11 @@
                             @endforeach
                         </tbody>
                     </table>
+                    @else
+                    <div class="alert alert-info">
+                        No projects have been created.
+                    </div>
+                    @endif
 
                     {{-- Create new project --}}
                     <a href="{{ route('token.create') }}" class="btn btn-outline-secondary">New project</a>
