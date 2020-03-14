@@ -1,78 +1,175 @@
-<p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>
+# Rezent
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+Rezent is a Laravel app which takes incoming requests from [Travis CI](https://travis-ci.com/), [Azure Pipelines](https://azure.microsoft.com/en-us/services/devops/pipelines/) or [GitHub Actions](https://github.com/features/actions) and acts as a notification webhook where it processes the build information and outputs the results to Discord and/or Slack.
 
-## About Laravel
+## Principle
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+For Rezent there are 5 main things that it does:
+1. Recieves the API request in the `DriverController`
+2. Creates a new `ProcessBuildRequest` job
+3. Runs the individual driver's code in `App/Drivers` directory
+4. Checks if it hasn't posted the message once already
+5. Posts the message to Discord and/or Slack
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Installation
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+To install Rezent, your machine must meet the below outlined requirements:
 
-## Learning Laravel
+### Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**Required**:
+- PHP 7.2.5+
+- Node & NPM
+- Composer
+- [Other Laravel requirements](https://laravel.com/docs/7.x/installation#server-requirements)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+**Highly recommended**:
+- Any of the [Laravel supported Queue drivers](https://laravel.com/docs/7.x/queues#driver-prerequisites) to speed up Rezent dramatically.
+  - Rezent already comes installed with the `predis/predis` Composer package installed.
 
-## Laravel Sponsors
+**Note**:
+- SMTP server access is optionally required because the `Forgot password?` action needs an e-mail server. If you do not have one, you can disable the action entirely by editing the `routes/web.php` file:
+```diff
+Route::namespace('App\Http\Controllers')->group(function () {
+-   Auth::routes(['register' => false]);
++   Auth::routes(['register' => false, 'reset' => false]);
+});
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+### Development
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- [UserInsights](https://userinsights.com)
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
-- [CodeBrisk](https://codebrisk.com)
-- [1Forge](https://1forge.com)
-- [TECPRESSO](https://tecpresso.co.jp/)
-- [Runtime Converter](http://runtimeconverter.com/)
-- [WebL'Agence](https://weblagence.com/)
-- [Invoice Ninja](https://www.invoiceninja.com)
-- [iMi digital](https://www.imi-digital.de/)
-- [Earthlink](https://www.earthlink.ro/)
-- [Steadfast Collective](https://steadfastcollective.com/)
-- [We Are The Robots Inc.](https://watr.mx/)
-- [Understand.io](https://www.understand.io/)
-- [Abdel Elrafa](https://abdelelrafa.com)
-- [Hyper Host](https://hyper.host)
-- [Appoly](https://www.appoly.co.uk)
-- [OP.GG](https://op.gg)
+To set up Rezent for development, you'll need to:
+- Fork the repository and clone it to your machine
+- `composer install`
+- `npm install`
+- `npm run dev`
+- `cp .env.example .env`
+- `php artisan key:generate`
+- Configure the `.env` file
+- `php artisan migrate`
+- `php artisan passport:install`
+- `php artisan make:user <name> <email>`
+
+_Optional_:
+- `php artisan ide-helper:generate`
+- `php artisan ide-helper:models`
+- `php artisan ide-helper:meta`
+
+Happy coding!
+
+### Production
+
+To set up Rezent for production, you'll need to:
+- Fork or clone the `master` branch
+- `composer install --optimize-autoloader --no-dev`
+- `npm install`
+- `npm run prod`
+- `cp .env.example .env`
+- Configure the `.env` file
+- `php artisan key:generate`
+- `php artisan migrate --force`
+- `php artisan config:cache`
+- `php artisan route:cache`
+- `php artisan make:user <name> <email>`
+
+Ready to roll!
+
+## Usage
+
+To start using Rezent, you'll need to follow these steps:
+1. Make sure that your `.env` file is configured correctly, so that you have the webhook information there
+2. Create a user if you haven't done so already
+3. Log in as the created user
+4. Create a new project
+5. Note down the access token that Rezent generates
+6. Configure your CI tool according to the specification below
+
+All the examples below will use Rezent at the following endpoint: `https://rezent.test`.
+
+### Travis CI
+
+Using Rezent with Travis is a very simple process. You'll need to add this to your `.travis.yml` file.
+
+```yaml
+notifications:
+  webhooks:
+    urls:
+      - https://rezent.test/api/driver/travis
+```
+
+### Azure Pipelines
+
+Azure Pipelines is a bit more tricky to set up.
+1. Navigate to your `Service Hooks` page (e.g. `https://dev.azure.com/my-org/my-repo/_settings/serviceHooks`)
+2. Add a new service hook by using the green `+`
+3. Select `Web Hooks`
+4. Select the `Build completed` event
+5. In the URL input, set it to `https://rezent.test/api/driver/pipelines`
+6. In the `HTTP headers` field add this: `Authorization: Bearer <the copied token>`
+7. Don't test it because it won't work (it sends a unusable payload), just save it with `Next`
+
+### GitHub Actions
+
+GitHub Actions doesn't have a webhook implementation so we'll use `cURL`. To use it, you'll need to:
+- Set the `REZENT_TOKEN` value in your repository's `Settings/Secrets` GitHub page
+- Obtain the workflow ID that you will be testing against:
+  1. You'll need to get the workflow ID which isn't available anywhere in the UI side
+  2. Run this command (replace the placeholder data): `curl "https://api.github.com/repos/my-org/my-repo/actions/workflows"`
+  3. Look for the workflow that matches the workflow name you want and find the ID of that workflow
+  4. Insert that ID into your the placeholder ID of `123456`
+
+**Example**:
+
+```yaml
+jobs:
+  notify:
+    needs: [validate, build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Rezent
+        env:
+          REZENT_TOKEN: ${{ secrets.REZENT_TOKEN }}
+        if: always()
+        run: |
+          curl -H "Authorization: Bearer ${REZENT_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/json" \
+            -X POST \
+            -d '{"organisation": "my-org", "repository": "my-repo", "workflow_id": 123456}' \
+            "https://rezent.test/api/driver/actions"
+```
+
+## Testing
+
+Run the tests with:
+
+```bash
+php artisan test
+```
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Please see [CONTRIBUTING.md](https://github.com/CreepPork/Rezent/blob/master/CONTRIBUTING.md) for details.
 
-## Code of Conduct
+## Security
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+If you discover any security-related issues, please e-mail <a href="mailto:security@garkaklis.com?subject=Security issue in Rezent">security@garkaklis.com</a> instead of using the issue tracker.
 
-## Security Vulnerabilities
+## Rezent name
+```
+So, funny name for Mechilles, ZEN'ified. More of a joke, but I imagined the fact that it builds each build over and over for each new thing, and also the developer's resentment when the build fails 😄
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+The name is... ReZENt 😄
+```
+— [Radium](https://github.com/TheRadiumDude)
+
+## Credits
+
+- [Ralfs Garkaklis](https://github.com/CreepPork)
+- [Radium](https://github.com/TheRadiumDude)
+- [All Contributors](https://github.com/CreepPork/Rezent/contributors)
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The MIT License (MIT). Please see the [License file](https://github.com/CreepPork/Rezent/blob/master/LICENSE) for more information.
