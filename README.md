@@ -157,11 +157,11 @@ Please see [CONTRIBUTING.md](https://github.com/CreepPork/Rezent/blob/master/CON
 If you discover any security-related issues, please e-mail <a href="mailto:security@garkaklis.com?subject=Security issue in Rezent">security@garkaklis.com</a> instead of using the issue tracker.
 
 ## Rezent name
-```
-So, funny name for Mechilles, ZEN'ified. More of a joke, but I imagined the fact that it builds each build over and over for each new thing, and also the developer's resentment when the build fails 😄
 
-The name is... ReZENt 😄
-```
+> So, funny name for Mechilles, ZEN'ified. More of a joke, but I imagined the fact that it builds each build over and over for each new thing, and also the developer's resentment when the build fails 😄
+>
+> The name is... ReZENt 😄
+
 — [Radium](https://github.com/TheRadiumDude)
 
 ## Credits
