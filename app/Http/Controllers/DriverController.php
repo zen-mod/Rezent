@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Drivers\ActionsDriver;
 use App\Drivers\PipelinesDriver;
-use App\Drivers\TravisDriver;
 use App\Exceptions\DriverNotFound;
 use App\Jobs\ProcessBuildRequest;
 use Illuminate\Http\Request;
@@ -54,9 +53,6 @@ class DriverController extends Controller
         switch ($name) {
             case 'pipelines':
                 return PipelinesDriver::class;
-
-            case 'travis':
-                return TravisDriver::class;
 
             case 'actions':
                 return ActionsDriver::class;

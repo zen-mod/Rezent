@@ -1,6 +1,6 @@
 # Rezent
 
-Rezent is a Laravel app which takes incoming requests from [Travis CI](https://travis-ci.com/), [Azure Pipelines](https://azure.microsoft.com/en-us/services/devops/pipelines/) or [GitHub Actions](https://github.com/features/actions) and acts as a notification webhook where it processes the build information and outputs the results to Discord and/or Slack.
+Rezent is a Laravel app which takes incoming requests from [Azure Pipelines](https://azure.microsoft.com/en-us/services/devops/pipelines/) or [GitHub Actions](https://github.com/features/actions) and acts as a notification webhook where it processes the build information and outputs the results to Discord and/or Slack.
 
 ## Principle
 
@@ -85,17 +85,6 @@ To start using Rezent, you'll need to follow these steps:
 6. Configure your CI tool according to the specification below
 
 All the examples below will use Rezent at the following endpoint: `https://rezent.test`.
-
-### Travis CI
-
-Using Rezent with Travis is a very simple process. You'll need to add this to your `.travis.yml` file.
-
-```yaml
-notifications:
-  webhooks:
-    urls:
-      - https://rezent.test/api/driver/travis
-```
 
 ### Azure Pipelines
 
