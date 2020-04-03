@@ -139,7 +139,7 @@ php artisan test
 
 ## Contributing
 
-Please see [CONTRIBUTING.md](https://github.com/CreepPork/Rezent/blob/master/CONTRIBUTING.md) for details.
+Please see [CONTRIBUTING.md](https://github.com/zen-mod/Rezent/blob/master/CONTRIBUTING.md) for details.
 
 ## Security
 
@@ -157,8 +157,8 @@ If you discover any security-related issues, please e-mail <a href="mailto:secur
 
 - [Ralfs Garkaklis](https://github.com/CreepPork)
 - [Radium](https://github.com/TheRadiumDude)
-- [All Contributors](https://github.com/CreepPork/Rezent/contributors)
+- [All Contributors](https://github.com/zen-mod/Rezent/contributors)
 
 ## License
 
-The MIT License (MIT). Please see the [License file](https://github.com/CreepPork/Rezent/blob/master/LICENSE) for more information.
+The MIT License (MIT). Please see the [License file](https://github.com/zen-mod/Rezent/blob/master/LICENSE) for more information.

@@ -2,7 +2,7 @@
 
 Contributions are **welcome** and will be fully **credited**.
 
-We accept contributions via Pull Requests on [GitHub](https://github.com/CreepPork/Rezent).
+We accept contributions via Pull Requests on [GitHub](https://github.com/zen-mod/Rezent).
 
 
 ## Pull Requests
