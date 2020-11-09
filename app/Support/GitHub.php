@@ -29,7 +29,16 @@ class GitHub
 
         $response = Http::get($url)->throw();
 
-        return json_decode($response->body())
+        $json = json_decode($response->body())
             ->workflow_runs[0];
+
+        if ($json->conclusion == null) {
+            // Sometimes GitHub's API "conclusion" property is null, so we delay and we try again
+            sleep(5);
+
+            return $this->getLatestActionWorkflowRun($organisation, $repository, $workflow_id);
+        } else {
+            return $json;
+        }
     }
 }
