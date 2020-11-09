@@ -5,6 +5,7 @@ namespace App\Drivers;
 use App\Driver;
 use App\Support\GitHub;
 use App\Support\Pipelines;
+use Illuminate\Support\Str;
 
 class PipelinesDriver extends Driver
 {
@@ -55,7 +56,7 @@ class PipelinesDriver extends Driver
             'description' => $this->getBuildDescription(
                 $this->commit->sha,
                 $this->commit->html_url,
-                $this->commit->commit->message
+                Str::limit($this->commit->commit->message, 1500)
             ),
             'timestamp' => $this->validated['resource']['finishTime'],
             'title' => $this->getBuildTitle(

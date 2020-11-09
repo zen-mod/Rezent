@@ -4,6 +4,7 @@ namespace App\Drivers;
 
 use App\Driver;
 use App\Support\GitHub;
+use Illuminate\Support\Str;
 
 class ActionsDriver extends Driver
 {
@@ -57,7 +58,7 @@ class ActionsDriver extends Driver
             'description' => $this->getBuildDescription(
                 $this->payload->head_sha,
                 $commit->html_url,
-                $this->payload->head_commit->message
+                Str::limit($this->payload->head_commit->message, 1500)
             ),
             'timestamp' => $this->payload->updated_at,
             'title' => $this->getBuildTitle(
